@@ -646,6 +646,7 @@ function sendResults() {
       user_name: name,
       user_email: email,
       user_advisor: advisor,
+      cc_email: advisor.toLowerCase().replace(' ', '.') + '@trinityadvisory.com.au',
       bcc_email: 'mark.nixey@trinityadvisory.com.au',
       q1: answers[1], q2: answers[2], q3: answers[3],
       q4: answers[4], q5: answers[5], q6: answers[6],
@@ -660,7 +661,7 @@ function sendResults() {
       chart_image: chartImage
     };
 
-    return emailjs.send('service_e65oe1s', 'template_wrm58y8', templateParams, 'Nc4yPcNxVpia0feeL');
+    return emailjs.send('service_v9ps7h6', 'template_wrm58y8', templateParams, 'Nc4yPcNxVpia0feeL');
   })
     .then(() => {
       msg.innerHTML = '<span style="color:#16a34a">Sent! Check your inbox.</span>';
