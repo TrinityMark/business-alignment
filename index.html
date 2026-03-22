@@ -164,9 +164,20 @@
       font-family: inherit;
       transition: border-color 0.15s;
     }
-    .form-field input:focus {
+    .form-field input:focus, .form-field select:focus {
       outline: none;
       border-color: #2563eb;
+    }
+    .form-field select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+      transition: border-color 0.15s;
+      color: #1e293b;
     }
     .submit-btn {
       width: 100%;
@@ -219,14 +230,26 @@
       <h3>Email My Results</h3>
       <div class="form-field">
         <label for="userName">Name</label>
-        <input type="text" id="userName" placeholder="Your name">
+        <input type="text" id="userName" placeholder="Your name" oninput="checkFormReady()">
+      </div>
+      <div class="form-field">
+        <label for="userAdvisor">Your Advisor</label>
+        <select id="userAdvisor" onchange="checkFormReady()">
+          <option value="">Select your advisor</option>
+          <option>Andrea Szasz</option>
+          <option>Conor Sarran</option>
+          <option>Josh Sherrington</option>
+          <option>Joshua Patten</option>
+          <option>Nick Mulqueen</option>
+          <option>Richard Caldecott</option>
+        </select>
       </div>
       <div class="form-field">
         <label for="userEmail">Email</label>
-        <input type="email" id="userEmail" placeholder="you@example.com">
+        <input type="email" id="userEmail" placeholder="you@example.com" oninput="checkFormReady()">
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="sendResults()">Email me my answers</button>
-      <button class="submit-btn download-btn" id="downloadBtn" onclick="downloadPDF()">Download PDF</button>
+      <button class="submit-btn" id="submitBtn" onclick="sendResults()" disabled>Email me my answers</button>
+      <button class="submit-btn download-btn" id="downloadBtn" onclick="downloadPDF()" disabled>Download PDF</button>
       <div class="form-msg" id="formMsg"></div>
     </div>
   </div>
@@ -594,23 +617,24 @@ function captureChart() {
   });
 }
 
+// ── Check if form is ready to enable buttons ─────────────────────────────────
+function checkFormReady() {
+  const name = document.getElementById('userName').value.trim();
+  const advisor = document.getElementById('userAdvisor').value;
+  const email = document.getElementById('userEmail').value.trim();
+  const allAnswered = Object.values(answers).every(v => v > 0);
+  const ready = name && advisor && email && allAnswered;
+  document.getElementById('submitBtn').disabled = !ready;
+  document.getElementById('downloadBtn').disabled = !ready;
+}
+
 // ── EmailJS send ─────────────────────────────────────────────────────────────
 function sendResults() {
   const name = document.getElementById('userName').value.trim();
+  const advisor = document.getElementById('userAdvisor').value;
   const email = document.getElementById('userEmail').value.trim();
   const msg = document.getElementById('formMsg');
   const btn = document.getElementById('submitBtn');
-
-  // Validate
-  const allAnswered = Object.values(answers).every(v => v > 0);
-  if (!name || !email) {
-    msg.innerHTML = '<span style="color:#dc2626">Please enter your name and email</span>';
-    return;
-  }
-  if (!allAnswered) {
-    msg.innerHTML = '<span style="color:#dc2626">Please answer all 9 questions first</span>';
-    return;
-  }
 
   btn.disabled = true;
   btn.textContent = 'Generating chart...';
@@ -621,6 +645,8 @@ function sendResults() {
     const templateParams = {
       user_name: name,
       user_email: email,
+      user_advisor: advisor,
+      bcc_email: 'mark.nixey@trinityadvisory.com.au',
       q1: answers[1], q2: answers[2], q3: answers[3],
       q4: answers[4], q5: answers[5], q6: answers[6],
       q7: answers[7], q8: answers[8], q9: answers[9],
@@ -651,13 +677,7 @@ function sendResults() {
 
 // ── Download PDF ─────────────────────────────────────────────────────────────
 function downloadPDF() {
-  const allAnswered = Object.values(answers).every(v => v > 0);
   const msg = document.getElementById('formMsg');
-  if (!allAnswered) {
-    msg.innerHTML = '<span style="color:#dc2626">Please answer all 9 questions first</span>';
-    return;
-  }
-
   const btn = document.getElementById('downloadBtn');
   btn.disabled = true;
   btn.textContent = 'Generating...';
@@ -787,7 +807,7 @@ function downloadPDF() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-function update() { renderQ(); renderChart(); renderScores(); }
+function update() { renderQ(); renderChart(); renderScores(); checkFormReady(); }
 loadFromURL();
 update();
 </script>
