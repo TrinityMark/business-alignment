@@ -646,6 +646,7 @@ function sendResults() {
       user_name: name,
       user_email: email,
       user_advisor: advisor,
+      advisor_first: advisor.split(' ')[0],
       cc_email: advisor.toLowerCase().replace(' ', '.') + '@trinityadvisory.com.au',
       bcc_email: 'mark.nixey@trinityadvisory.com.au',
       q1: answers[1], q2: answers[2], q3: answers[3],
