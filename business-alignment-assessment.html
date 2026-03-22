@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Alignment Assessment</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #1e3a5f;
+      color: white;
+      padding: 18px 32px;
+      border-bottom: 3px solid #2563eb;
+    }
+    header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    header p  { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+
+    .layout {
+      display: flex;
+      flex: 1;
+      align-items: flex-start;
+    }
+
+    /* ---- Questions ---- */
+    .q-panel {
+      width: 460px;
+      flex-shrink: 0;
+      background: white;
+      border-right: 1px solid #e2e8f0;
+      padding: 24px;
+      min-height: 100%;
+    }
+
+    .cat-block { margin-bottom: 28px; }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid;
+    }
+    .cat-pip { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .cat-name { font-size: 12px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+    .cat-tally { margin-left: auto; font-size: 12px; font-weight: 600; color: #64748b; }
+
+    .q-item { margin-bottom: 18px; }
+    .q-text { font-size: 13.5px; line-height: 1.5; color: #374151; margin-bottom: 9px; }
+    .q-num  { font-weight: 700; margin-right: 5px; }
+
+    .ans-row { display: flex; align-items: center; gap: 5px; }
+
+    .ans-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      background: white;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.12s, border-color 0.12s, color 0.12s;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+    }
+    .ans-btn:hover { transform: scale(1.12); }
+
+    .ans-lbl {
+      font-size: 10.5px;
+      color: #64748b;
+      margin-left: 8px;
+      font-style: italic;
+      min-width: 96px;
+    }
+
+    /* ---- Chart panel ---- */
+    .chart-panel {
+      flex: 1;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .chart-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    #radar {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ---- Score cards ---- */
+    .scores {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 16px;
+    }
+
+    .score-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: 3px solid;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .sc-cat   { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+    .sc-val   { font-size: 26px; font-weight: 700; line-height: 1.1; margin-top: 4px; }
+    .sc-max   { font-size: 13px; font-weight: 400; opacity: 0.45; }
+    .sc-interp{ font-size: 11px; color: #64748b; margin-top: 3px; min-height: 16px; }
+
+    /* ---- Email form ---- */
+    .email-form {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 24px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .email-form h3 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+    .form-field {
+      margin-bottom: 12px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    .form-field input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .form-field input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1e3a5f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { background: #2563eb; }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .download-btn { background: #2563eb; margin-top: 8px; }
+    .download-btn:hover { background: #1e3a5f; }
+    .form-msg {
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .layout { flex-direction: column; }
+      .q-panel { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>Business Alignment Framework Assessment</h1>
+  <p>Select your answer for each question -the chart updates in real time</p>
+</header>
+
+<div class="layout">
+  <div class="q-panel" id="qpanel"></div>
+  <div class="chart-panel">
+    <div class="chart-title">Business Alignment Plot</div>
+    <svg id="radar" viewBox="0 0 500 510"></svg>
+    <div class="scores" id="scores"></div>
+
+    <div class="email-form" id="emailForm">
+      <h3>Email My Results</h3>
+      <div class="form-field">
+        <label for="userName">Name</label>
+        <input type="text" id="userName" placeholder="Your name">
+      </div>
+      <div class="form-field">
+        <label for="userEmail">Email</label>
+        <input type="email" id="userEmail" placeholder="you@example.com">
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="sendResults()">Email me my answers</button>
+      <button class="submit-btn download-btn" id="downloadBtn" onclick="downloadPDF()">Download PDF</button>
+      <div class="form-msg" id="formMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const CATS = [
+  {
+    id: 'uvp', name: 'Unique Value Proposition (UVP)', short: 'UVP', color: '#2563eb',
+    qs: [
+      { n:1, text:'Our clients clearly understand what makes our business unique' },
+      { n:2, text:'Our pricing reflects the value we deliver -not just what competitors charge' },
+      { n:3, text:'Our clients and prospects see our offering as worth paying a premium for' },
+    ]
+  },
+  {
+    id: 'clients', name: 'Top Clients', short: 'TOP CLIENTS', color: '#16a34a',
+    qs: [
+      { n:4, text:'We have a clearly defined client niche that loves what we offer' },
+      { n:5, text:'We know exactly who our best clients are and what they value most' },
+      { n:6, text:'Our marketing consistently attracts the kind of clients we most want to work with' },
+    ]
+  },
+  {
+    id: 'systems', name: 'Systems', short: 'SYSTEMS', color: '#ea580c',
+    qs: [
+      { n:7, text:'Our systems and processes deliver consistent quality without relying on me' },
+      { n:8, text:'The business could operate smoothly for at least four weeks without my direct involvement' },
+      { n:9, text:'Our systems support continued growth without increasing stress or workload' },
+    ]
+  }
+];
+
+const SCALE_LABELS = ['Never True', 'Sometimes True', 'Moderately True', 'Mostly True', 'Always True'];
+
+// Clockwise from top: Q3, Q2, Q1 (UVP - upper right)
+//                     Q9, Q8, Q7 (Systems - bottom)
+//                     Q6, Q5, Q4 (Top Clients - left)
+const AXIS_Q = [3, 2, 1, 9, 8, 7, 6, 5, 4];
+
+// Axis indices per category
+const CAT_AXES = { uvp:[0,1,2], systems:[3,4,5], clients:[6,7,8] };
+
+const answers = Object.fromEntries(Array.from({length:9},(_,i)=>[i+1,0]));
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function catFor(n) { return CATS.find(c => c.qs.some(q => q.n === n)); }
+function score(cat) { return cat.qs.reduce((s,q) => s + answers[q.n], 0); }
+function answered(cat) { return cat.qs.filter(q => answers[q.n] > 0).length; }
+
+function interpret(s) {
+  if (s >= 12) return { text:'Great', color:'#16a34a' };
+  if (s >= 8)  return { text:'Some work to do', color:'#d97706' };
+  if (s >= 4)  return { text:'Work to do', color:'#ea580c' };
+  return { text:'A lot of work to do', color:'#dc2626' };
+}
+
+// ── Render questions ──────────────────────────────────────────────────────────
+function renderQ() {
+  const panel = document.getElementById('qpanel');
+  panel.innerHTML = '';
+
+  CATS.forEach(cat => {
+    const sc = score(cat), ans = answered(cat);
+    const block = document.createElement('div');
+    block.className = 'cat-block';
+    block.innerHTML = `
+      <div class="cat-header" style="border-color:${cat.color}">
+        <div class="cat-pip" style="background:${cat.color}"></div>
+        <span class="cat-name" style="color:${cat.color}">${cat.name}</span>
+        <span class="cat-tally">${ans===3 ? sc+'/15' : ans+' of 3 answered'}</span>
+      </div>`;
+
+    cat.qs.forEach(q => {
+      const sel = answers[q.n];
+      let btns = '';
+      for (let v=1; v<=5; v++) {
+        const on = sel===v;
+        const style = on
+          ? `background:${cat.color};border-color:${cat.color};color:white`
+          : `color:${cat.color};border-color:#e2e8f0`;
+        btns += `<button class="ans-btn" data-q="${q.n}" data-v="${v}"
+          style="${style}" title="${SCALE_LABELS[v-1]}">${v}</button>`;
+      }
+
+      const item = document.createElement('div');
+      item.className = 'q-item';
+      item.innerHTML = `
+        <div class="q-text"><span class="q-num">${q.n}.</span>${q.text}</div>
+        <div class="ans-row">
+          ${btns}
+          <span class="ans-lbl">${sel>0 ? SCALE_LABELS[sel-1] : 'tap to answer'}</span>
+        </div>`;
+      block.appendChild(item);
+    });
+
+    panel.appendChild(block);
+  });
+
+  panel.querySelectorAll('.ans-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qn=+btn.dataset.q, v=+btn.dataset.v;
+      answers[qn] = answers[qn]===v ? 0 : v;
+      update();
+    });
+  });
+}
+
+// ── Render chart ──────────────────────────────────────────────────────────────
+function renderChart() {
+  const svg = document.getElementById('radar');
+  const NS = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+
+  const cx=250, cy=258, maxR=170, N=9;
+
+  function ang(i)  { return -Math.PI/2 + i*2*Math.PI/N; }
+  function pt(i,r) { const a=ang(i); return {x: cx+r*Math.cos(a), y: cy+r*Math.sin(a)}; }
+  function vr(v)   { return v>0 ? maxR*(6-v)/5 : 0; }
+
+  function el(tag, attrs, txt) {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  }
+  function polyPts(indices, r) {
+    return indices.map(i => { const p=pt(i,r); return `${p.x},${p.y}`; }).join(' ');
+  }
+
+  const all = Array.from({length:N},(_,i)=>i);
+
+  // Grid rings
+  for (let v=1; v<=5; v++) {
+    svg.appendChild(el('polygon', {
+      points: polyPts(all, vr(v)),
+      fill: 'none',
+      stroke: '#d1d5db',
+      'stroke-width': '1',
+      'stroke-dasharray': v<5 ? '3,3' : 'none'
+    }));
+  }
+
+  // Axis lines
+  all.forEach(i => {
+    const p=pt(i,maxR);
+    svg.appendChild(el('line',{x1:cx,y1:cy,x2:p.x,y2:p.y,stroke:'#d1d5db','stroke-width':'1'}));
+  });
+
+  // Scale numbers -sit just right of the vertical axis (Q3, index 0)
+  for (let v=1; v<=5; v++) {
+    svg.appendChild(el('text',{
+      x: cx+5, y: cy-vr(v)+3.5,
+      'font-size':'10','fill':'#9ca3af','font-family':'sans-serif','text-anchor':'start'
+    }, String(v)));
+  }
+
+  // Category circles: compute centers & radii, then draw overlap, then circles
+  const catCircles = [];
+  CATS.forEach(cat => {
+    const axes = CAT_AXES[cat.id];
+    // Center: pushed outward from chart center toward the category's middle axis
+    const midIdx = axes[1]; // middle axis of the 3
+    const midPt = pt(midIdx, maxR * 0.38);
+    const gc = { x: midPt.x, y: midPt.y };
+
+    const r = maxR * 0.45;
+
+    catCircles.push({ cat, cx:gc.x, cy:gc.y, r });
+  });
+
+  // Draw overlap of all three circles using SVG clipPath
+  const defs = el('defs',{});
+
+  // Create clip paths for each circle
+  catCircles.forEach((cc,i) => {
+    const clip = el('clipPath',{id:`cat-clip-${i}`});
+    clip.appendChild(el('circle',{cx:cc.cx,cy:cc.cy,r:cc.r}));
+    defs.appendChild(clip);
+  });
+
+  // Nested clip: clip circle 1 by circle 2, then draw circle 0 clipped by that
+  // For triple overlap: draw circle 0, clipped to circle 1, clipped to circle 2
+  const clipAB = el('clipPath',{id:'clip-ab'});
+  const cAB = el('circle',{cx:catCircles[1].cx,cy:catCircles[1].cy,r:catCircles[1].r});
+  clipAB.appendChild(cAB);
+  defs.appendChild(clipAB);
+
+  svg.appendChild(defs);
+
+  // Draw pairwise overlaps first (lighter), then triple overlap (darker)
+  // Pairwise: for each pair, draw a circle clipped by the other
+  for (let i=0; i<3; i++) {
+    for (let j=i+1; j<3; j++) {
+      const g = el('g',{'clip-path':`url(#cat-clip-${j})`});
+      g.appendChild(el('circle',{
+        cx:catCircles[i].cx, cy:catCircles[i].cy, r:catCircles[i].r,
+        fill:'rgba(37,99,235,0.08)', stroke:'none'
+      }));
+      svg.appendChild(g);
+    }
+  }
+
+  // Triple overlap: circle 0 clipped by circle 1 clipped by circle 2
+  const g12 = el('g',{'clip-path':'url(#cat-clip-1)'});
+  const g12inner = el('g',{'clip-path':'url(#cat-clip-2)'});
+  g12inner.appendChild(el('circle',{
+    cx:catCircles[0].cx, cy:catCircles[0].cy, r:catCircles[0].r,
+    fill:'rgba(37,99,235,0.18)', stroke:'none'
+  }));
+  g12.appendChild(g12inner);
+  svg.appendChild(g12);
+
+  // Draw the category circles with light fill
+  catCircles.forEach(cc => {
+    const hex = cc.cat.color;
+    const r2 = parseInt(hex.slice(1,3),16);
+    const g2 = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+
+    svg.appendChild(el('circle',{
+      cx:cc.cx, cy:cc.cy, r:cc.r,
+      fill: `rgba(${r2},${g2},${b},0.06)`,
+      stroke:cc.cat.color, 'stroke-width':'1.5', opacity:'0.55'
+    }));
+  });
+
+  // Category labels
+  catCircles.forEach(cc => {
+    const dir = Math.atan2(cc.cy-cy, cc.cx-cx);
+    const lx = cc.cx + Math.cos(dir)*cc.r*0.45;
+    const ly = cc.cy + Math.sin(dir)*cc.r*0.45;
+
+    svg.appendChild(el('text',{
+      x:lx, y:ly,
+      'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':'10.5','font-weight':'700',
+      'fill':cc.cat.color,'font-family':'sans-serif','letter-spacing':'0.8'
+    }, cc.cat.short));
+  });
+
+  // Data points
+  const pts = AXIS_Q.map((qn,i) => answers[qn]>0 ? pt(i,vr(answers[qn])) : null);
+  const filledPts = pts.filter(Boolean);
+
+  // Skip the connector between axis index 2 (Q1) and axis index 3 (Q9)
+  const SKIP_EDGE = [2, 3];
+
+  if (filledPts.length > 0) {
+    if (filledPts.length === 9) {
+      // Full shape -use polyline (open) + individual lines, skipping Q1↔Q9 edge
+      // Draw filled polygon without the closing edge via a path
+      const d = pts.map((p,i) => `${i===0?'M':'L'}${p.x},${p.y}`).join(' ');
+      svg.appendChild(el('path',{
+        d: d + ' Z',
+        fill:'rgba(30,74,107,0.12)',
+        stroke:'none'
+      }));
+      // Draw edges individually, skipping Q1↔Q9
+      for (let i=0; i<N; i++) {
+        const j=(i+1)%N;
+        if ((i===SKIP_EDGE[0]&&j===SKIP_EDGE[1])||(i===SKIP_EDGE[1]&&j===SKIP_EDGE[0])) continue;
+        svg.appendChild(el('line',{
+          x1:pts[i].x,y1:pts[i].y,x2:pts[j].x,y2:pts[j].y,
+          stroke:'#1e4a6b','stroke-width':'2.5','stroke-linejoin':'round'
+        }));
+      }
+    } else {
+      // Partial: connect adjacent answered points, skipping Q1↔Q9
+      for (let i=0; i<N; i++) {
+        const j=(i+1)%N;
+        if ((i===SKIP_EDGE[0]&&j===SKIP_EDGE[1])||(i===SKIP_EDGE[1]&&j===SKIP_EDGE[0])) continue;
+        const p1=pts[i], p2=pts[j];
+        if (p1&&p2) {
+          svg.appendChild(el('line',{
+            x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,
+            stroke:'#1e4a6b','stroke-width':'2',opacity:'0.55'
+          }));
+        }
+      }
+    }
+
+    // Dots
+    pts.forEach(p => {
+      if (!p) return;
+      svg.appendChild(el('circle',{cx:p.x,cy:p.y,r:'5',fill:'#1e4a6b',stroke:'white','stroke-width':'2'}));
+    });
+  }
+
+  // Axis labels Q1–Q9
+  AXIS_Q.forEach((qn,i) => {
+    const p=pt(i,maxR+22);
+    svg.appendChild(el('text',{
+      x:p.x, y:p.y,
+      'text-anchor':'middle','dominant-baseline':'middle',
+      'font-size':'12','font-weight':'600','fill':'#374151','font-family':'sans-serif'
+    }, `Q${qn}`));
+  });
+}
+
+// ── Render scores ─────────────────────────────────────────────────────────────
+function renderScores() {
+  const grid = document.getElementById('scores');
+  grid.innerHTML = '';
+
+  CATS.forEach(cat => {
+    const sc = score(cat), ans = answered(cat);
+    const interp = ans===3 ? interpret(sc) : null;
+
+    const card = document.createElement('div');
+    card.className = 'score-card';
+    card.style.borderTopColor = cat.color;
+    card.innerHTML = `
+      <div class="sc-cat" style="color:${cat.color}">${cat.short}</div>
+      <div class="sc-val" style="color:${cat.color}">${ans===3?sc:'—'}<span class="sc-max">/15</span></div>
+      <div class="sc-interp">${
+        interp
+          ? `<span style="color:${interp.color};font-weight:600">${interp.text}</span>`
+          : `${ans} of 3 answered`
+      }</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── URL params: load answers from ?q=3,2,4,3,5,1,4,2,3 ─────────────────────
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  if (q) {
+    const vals = q.split(',').map(Number);
+    if (vals.length === 9 && vals.every(v => v >= 1 && v <= 5)) {
+      vals.forEach((v, i) => { answers[i + 1] = v; });
+    }
+  }
+}
+
+// ── Build results URL ────────────────────────────────────────────────────────
+function resultsURL() {
+  const vals = Array.from({length:9}, (_, i) => answers[i+1]);
+  const base = window.location.href.split('?')[0];
+  return `${base}?q=${vals.join(',')}`;
+}
+
+// ── Capture chart as base64 PNG ───────────────────────────────────────────────
+function captureChart() {
+  return new Promise((resolve, reject) => {
+    const offscreen = document.createElement('div');
+    offscreen.style.cssText = 'position:absolute;left:-9999px;top:0;background:white;padding:10px;width:520px;display:flex;justify-content:center;';
+
+    const svgClone = document.getElementById('radar').cloneNode(true);
+    svgClone.setAttribute('viewBox', '30 0 440 510');
+    svgClone.style.cssText = 'width:500px;height:auto;display:block;';
+    offscreen.appendChild(svgClone);
+
+    document.body.appendChild(offscreen);
+
+    html2canvas(offscreen, { backgroundColor: '#ffffff', scale: 1 }).then(canvas => {
+      document.body.removeChild(offscreen);
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
+    }).catch(err => {
+      if (document.body.contains(offscreen)) document.body.removeChild(offscreen);
+      reject(err);
+    });
+  });
+}
+
+// ── EmailJS send ─────────────────────────────────────────────────────────────
+function sendResults() {
+  const name = document.getElementById('userName').value.trim();
+  const email = document.getElementById('userEmail').value.trim();
+  const msg = document.getElementById('formMsg');
+  const btn = document.getElementById('submitBtn');
+
+  // Validate
+  const allAnswered = Object.values(answers).every(v => v > 0);
+  if (!name || !email) {
+    msg.innerHTML = '<span style="color:#dc2626">Please enter your name and email</span>';
+    return;
+  }
+  if (!allAnswered) {
+    msg.innerHTML = '<span style="color:#dc2626">Please answer all 9 questions first</span>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Generating chart...';
+
+  captureChart().then(chartImage => {
+    btn.textContent = 'Sending...';
+
+    const templateParams = {
+      user_name: name,
+      user_email: email,
+      q1: answers[1], q2: answers[2], q3: answers[3],
+      q4: answers[4], q5: answers[5], q6: answers[6],
+      q7: answers[7], q8: answers[8], q9: answers[9],
+      uvp_score: score(CATS[0]),
+      uvp_interp: interpret(score(CATS[0])).text,
+      clients_score: score(CATS[1]),
+      clients_interp: interpret(score(CATS[1])).text,
+      systems_score: score(CATS[2]),
+      systems_interp: interpret(score(CATS[2])).text,
+      total: score(CATS[0]) + score(CATS[1]) + score(CATS[2]),
+      chart_image: chartImage
+    };
+
+    return emailjs.send('service_e65oe1s', 'template_wrm58y8', templateParams, 'Nc4yPcNxVpia0feeL');
+  })
+    .then(() => {
+      msg.innerHTML = '<span style="color:#16a34a">Sent! Check your inbox.</span>';
+      btn.textContent = 'Email me my answers';
+      btn.disabled = false;
+    })
+    .catch((err) => {
+      msg.innerHTML = '<span style="color:#dc2626">Failed to send -please try again</span>';
+      btn.textContent = 'Email me my answers';
+      btn.disabled = false;
+      console.error('EmailJS error:', err);
+    });
+}
+
+// ── Download PDF ─────────────────────────────────────────────────────────────
+function downloadPDF() {
+  const allAnswered = Object.values(answers).every(v => v > 0);
+  const msg = document.getElementById('formMsg');
+  if (!allAnswered) {
+    msg.innerHTML = '<span style="color:#dc2626">Please answer all 9 questions first</span>';
+    return;
+  }
+
+  const btn = document.getElementById('downloadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  // Build an offscreen container with just the chart (no scores, no form)
+  const offscreen = document.createElement('div');
+  offscreen.style.cssText = 'position:absolute;left:-9999px;top:0;background:white;padding:0;width:520px;display:flex;justify-content:center;';
+
+  // Clone SVG chart -use tight viewBox matching the chart content
+  const svgClone = document.getElementById('radar').cloneNode(true);
+  svgClone.setAttribute('viewBox', '30 0 440 510');
+  svgClone.style.cssText = 'width:520px;height:auto;display:block;';
+  offscreen.appendChild(svgClone);
+
+  document.body.appendChild(offscreen);
+
+  html2canvas(offscreen, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+    document.body.removeChild(offscreen);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentW = pageW - margin * 2;
+
+    const name = document.getElementById('userName').value.trim();
+
+    // Title in blue
+    pdf.setFontSize(18);
+    pdf.setTextColor(37, 99, 235);
+    const title = name ? `BUSINESS ALIGNMENT ASSESSMENT -${name.toUpperCase()}` : 'BUSINESS ALIGNMENT ASSESSMENT';
+    pdf.text(title, margin, 18);
+
+    // Questions and answers section
+    let y = 28;
+
+    CATS.forEach(cat => {
+      const hex = cat.color;
+      const cr = parseInt(hex.slice(1,3),16);
+      const cg = parseInt(hex.slice(3,5),16);
+      const cb = parseInt(hex.slice(5,7),16);
+
+      // Category header in its own color
+      pdf.setFontSize(11);
+      pdf.setFont(undefined, 'bold');
+      pdf.setTextColor(cr, cg, cb);
+      pdf.text(cat.name.toUpperCase(), margin, y);
+
+      const sc = score(cat);
+      const interp = interpret(sc);
+      pdf.setTextColor(cr, cg, cb);
+      pdf.setFontSize(10);
+      pdf.text(`${sc}/15 -${interp.text}`, pageW - margin, y, { align: 'right' });
+      y += 2;
+
+      // Colored underline
+      pdf.setDrawColor(cr, cg, cb);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, y, pageW - margin, y);
+      y += 6;
+
+      // Questions
+      cat.qs.forEach(q => {
+        const val = answers[q.n];
+        const label = SCALE_LABELS[val - 1];
+
+        pdf.setFontSize(10);
+        pdf.setFont(undefined, 'normal');
+        pdf.setTextColor(55, 65, 81);
+
+        // Question number bold
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`Q${q.n}.`, margin, y);
+        pdf.setFont(undefined, 'normal');
+        pdf.text(q.text, margin + 10, y);
+
+        // Answer in category color on the right
+        pdf.setFont(undefined, 'bold');
+        pdf.setTextColor(cr, cg, cb);
+        pdf.text(`${val} -${label}`, pageW - margin, y, { align: 'right' });
+
+        y += 6;
+      });
+
+      y += 4;
+    });
+
+    // Total (no line above)
+    const total = CATS.reduce((s, c) => s + score(c), 0);
+    pdf.setFontSize(13);
+    pdf.setFont(undefined, 'bold');
+    pdf.setTextColor(30, 58, 95);
+    pdf.text(`Total: ${total}/45`, margin, y);
+    y += 8;
+
+    // Chart image -centered, fit remaining space on page 1
+    const imgData = canvas.toDataURL('image/png');
+    const ratio = canvas.height / canvas.width;
+    const availH = pageH - y - 10;
+    let imgW = contentW;
+    let imgH = imgW * ratio;
+
+    // Scale down to fit remaining page space
+    if (imgH > availH) {
+      imgH = availH;
+      imgW = imgH / ratio;
+    }
+
+    // Center horizontally
+    const imgX = (pageW - imgW) / 2;
+
+    pdf.addImage(imgData, 'PNG', imgX, y, imgW, imgH);
+
+    pdf.save('business-alignment-assessment.pdf');
+
+    btn.disabled = false;
+    btn.textContent = 'Download PDF';
+    msg.innerHTML = '<span style="color:#16a34a">PDF downloaded!</span>';
+  }).catch((err) => {
+    if (document.body.contains(offscreen)) document.body.removeChild(offscreen);
+    btn.disabled = false;
+    btn.textContent = 'Download PDF';
+    msg.innerHTML = '<span style="color:#dc2626">PDF generation failed -try again</span>';
+    console.error('PDF error:', err);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function update() { renderQ(); renderChart(); renderScores(); }
+loadFromURL();
+update();
+</script>
+</body>
+</html>
