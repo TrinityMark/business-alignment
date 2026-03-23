@@ -331,6 +331,19 @@ function interpret(catId, avgScore) {
   return tiers[tiers.length-1];
 }
 
+function interpretOverall(avgScore) {
+  const tiers = [
+    { min:4.5, label:'Strong Alignment', desc:"You're in a great position to scale. Your business runs smoothly, your clients see your value, and your systems support growth. The goal now is refinement and consistency." },
+    { min:3.5, label:'Mostly Aligned', desc:"You're close to balance. Focus first on the weakest pillar - even a small improvement there will create outsized results." },
+    { min:2.5, label:'Partially Aligned', desc:"Things work, but not easily. There's likely friction between what clients want, how you deliver, and how efficiently you run. Simplifying and clarifying will bring stability." },
+    { min:0,   label:'Misaligned', desc:"The business likely depends heavily on you, with mixed client satisfaction and inconsistent systems. This is your rebuild phase - the coming modules will give you the clarity and structure to realign." },
+  ];
+  for (const t of tiers) {
+    if (avgScore >= t.min) return { label:t.label, desc:t.desc };
+  }
+  return tiers[tiers.length-1];
+}
+
 // ── Render questions ──────────────────────────────────────────────────────────
 function renderQ() {
   const panel = document.getElementById('qpanel');
@@ -689,6 +702,8 @@ function sendResults() {
       systems_interp: interpret('systems', avg(CATS[2])).label,
       systems_desc: interpret('systems', avg(CATS[2])).desc,
       total: ((avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3).toFixed(1),
+      total_interp: interpretOverall((avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3).label,
+      total_desc: interpretOverall((avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3).desc,
       chart_image: chartImage
     };
 
@@ -798,12 +813,20 @@ function downloadPDF() {
       y += 4;
     });
 
-    // Overall Average
+    // Overall Average with interpretation
     const overallAvg = (avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3;
-    pdf.setFontSize(13);
+    const overallInterp = interpretOverall(overallAvg);
+    pdf.setFontSize(12);
     pdf.setFont(undefined, 'bold');
     pdf.setTextColor(30, 58, 95);
-    pdf.text(`Overall Average: ${overallAvg.toFixed(1)}`, margin, y);
+    pdf.text(`Overall Average: ${overallAvg.toFixed(1)} - ${overallInterp.label}`, margin, y);
+    y += 5;
+    pdf.setFontSize(9);
+    pdf.setFont(undefined, 'normal');
+    pdf.setTextColor(100, 116, 139);
+    const descLines = pdf.splitTextToSize(overallInterp.desc, contentW);
+    pdf.text(descLines, margin, y);
+    y += descLines.length * 4 + 2;
     y += 8;
 
     // Chart image -centered, fit remaining space on page 1
