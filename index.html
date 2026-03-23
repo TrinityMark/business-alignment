@@ -688,7 +688,7 @@ function sendResults() {
       systems_score: avg(CATS[2]).toFixed(1),
       systems_interp: interpret('systems', avg(CATS[2])).label,
       systems_desc: interpret('systems', avg(CATS[2])).desc,
-      total: (score(CATS[0]) + score(CATS[1]) + score(CATS[2])),
+      total: ((avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3).toFixed(1),
       chart_image: chartImage
     };
 
@@ -798,12 +798,12 @@ function downloadPDF() {
       y += 4;
     });
 
-    // Total (no line above)
-    const total = CATS.reduce((s, c) => s + score(c), 0);
+    // Overall Average
+    const overallAvg = (avg(CATS[0]) + avg(CATS[1]) + avg(CATS[2])) / 3;
     pdf.setFontSize(13);
     pdf.setFont(undefined, 'bold');
     pdf.setTextColor(30, 58, 95);
-    pdf.text(`Total: ${total}/45`, margin, y);
+    pdf.text(`Overall Average: ${overallAvg.toFixed(1)}`, margin, y);
     y += 8;
 
     // Chart image -centered, fit remaining space on page 1
