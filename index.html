@@ -301,11 +301,34 @@ function catFor(n) { return CATS.find(c => c.qs.some(q => q.n === n)); }
 function score(cat) { return cat.qs.reduce((s,q) => s + answers[q.n], 0); }
 function answered(cat) { return cat.qs.filter(q => answers[q.n] > 0).length; }
 
-function interpret(s) {
-  if (s >= 12) return { text:'Great', color:'#16a34a' };
-  if (s >= 8)  return { text:'Some work to do', color:'#d97706' };
-  if (s >= 4)  return { text:'Work to do', color:'#ea580c' };
-  return { text:'A lot of work to do', color:'#dc2626' };
+function avg(cat) { return (score(cat) / 3); }
+
+function interpret(catId, avgScore) {
+  const interps = {
+    uvp: [
+      { min:4.5, label:'Strong Alignment', desc:'Clients understand your difference and pay for it.' },
+      { min:3.5, label:'Mostly Clear', desc:'Offer resonates but messaging lacks full consistency.' },
+      { min:2.5, label:'Unclear or Inconsistent', desc:"Clients don't fully see your value despite quality." },
+      { min:0,   label:'Misaligned', desc:'You blend with competitors and face constant price pressure.' },
+    ],
+    clients: [
+      { min:4.5, label:'Strong Alignment', desc:'You know your top clients and consistently attract them.' },
+      { min:3.5, label:'Mostly Clear', desc:'Targeting or message could be sharper to reach best-fit clients.' },
+      { min:2.5, label:'Mixed Clarity', desc:'Serving ideal and non-ideal clients leads to inconsistent results.' },
+      { min:0,   label:'Misaligned', desc:'Saying yes too often is causing energy drain and profit leakage.' },
+    ],
+    systems: [
+      { min:4.5, label:'Strong Alignment', desc:'Systems are embedded and scalable; the team runs with confidence.' },
+      { min:3.5, label:'Moderately Scalable', desc:'Some structure exists, but key activities still depend on individuals.' },
+      { min:2.5, label:'Limited Structure', desc:'Growth creates strain; consistency wobbles when busy.' },
+      { min:0,   label:'Over-Reliant on Individuals', desc:"You're the bottleneck; time off feels impossible." },
+    ]
+  };
+  const tiers = interps[catId];
+  for (const t of tiers) {
+    if (avgScore >= t.min) return { label:t.label, desc:t.desc, color: avgScore>=4.5?'#16a34a' : avgScore>=3.5?'#2563eb' : avgScore>=2.5?'#d97706' : '#dc2626' };
+  }
+  return tiers[tiers.length-1];
 }
 
 // ── Render questions ──────────────────────────────────────────────────────────
@@ -321,7 +344,7 @@ function renderQ() {
       <div class="cat-header" style="border-color:${cat.color}">
         <div class="cat-pip" style="background:${cat.color}"></div>
         <span class="cat-name" style="color:${cat.color}">${cat.name}</span>
-        <span class="cat-tally">${ans===3 ? sc+'/15' : ans+' of 3 answered'}</span>
+        <span class="cat-tally">${ans===3 ? 'Avg: '+avg(cat).toFixed(1) : ans+' of 3 answered'}</span>
       </div>`;
 
     cat.qs.forEach(q => {
@@ -558,18 +581,22 @@ function renderScores() {
 
   CATS.forEach(cat => {
     const sc = score(cat), ans = answered(cat);
-    const interp = ans===3 ? interpret(sc) : null;
+    const a = avg(cat);
+    const interp = ans===3 ? interpret(cat.id, a) : null;
 
     const card = document.createElement('div');
     card.className = 'score-card';
     card.style.borderTopColor = cat.color;
     card.innerHTML = `
       <div class="sc-cat" style="color:${cat.color}">${cat.short}</div>
-      <div class="sc-val" style="color:${cat.color}">${ans===3?sc:'—'}<span class="sc-max">/15</span></div>
+      <div class="sc-val" style="color:${cat.color}">${ans===3 ? a.toFixed(1) : '—'}</div>
       <div class="sc-interp">${
         interp
-          ? `<span style="color:${interp.color};font-weight:600">${interp.text}</span>`
+          ? `<span style="color:${interp.color};font-weight:600">${interp.label}</span>`
           : `${ans} of 3 answered`
+      }</div>
+      <div class="sc-interp" style="font-size:10px;margin-top:2px;">${
+        interp ? interp.desc : ''
       }</div>`;
     grid.appendChild(card);
   });
@@ -652,13 +679,16 @@ function sendResults() {
       q1: answers[1], q2: answers[2], q3: answers[3],
       q4: answers[4], q5: answers[5], q6: answers[6],
       q7: answers[7], q8: answers[8], q9: answers[9],
-      uvp_score: score(CATS[0]),
-      uvp_interp: interpret(score(CATS[0])).text,
-      clients_score: score(CATS[1]),
-      clients_interp: interpret(score(CATS[1])).text,
-      systems_score: score(CATS[2]),
-      systems_interp: interpret(score(CATS[2])).text,
-      total: score(CATS[0]) + score(CATS[1]) + score(CATS[2]),
+      uvp_score: avg(CATS[0]).toFixed(1),
+      uvp_interp: interpret('uvp', avg(CATS[0])).label,
+      uvp_desc: interpret('uvp', avg(CATS[0])).desc,
+      clients_score: avg(CATS[1]).toFixed(1),
+      clients_interp: interpret('clients', avg(CATS[1])).label,
+      clients_desc: interpret('clients', avg(CATS[1])).desc,
+      systems_score: avg(CATS[2]).toFixed(1),
+      systems_interp: interpret('systems', avg(CATS[2])).label,
+      systems_desc: interpret('systems', avg(CATS[2])).desc,
+      total: (score(CATS[0]) + score(CATS[1]) + score(CATS[2])),
       chart_image: chartImage
     };
 
@@ -729,11 +759,11 @@ function downloadPDF() {
       pdf.setTextColor(cr, cg, cb);
       pdf.text(cat.name.toUpperCase(), margin, y);
 
-      const sc = score(cat);
-      const interp = interpret(sc);
+      const a = avg(cat);
+      const interp = interpret(cat.id, a);
       pdf.setTextColor(cr, cg, cb);
       pdf.setFontSize(10);
-      pdf.text(`${sc}/15 -${interp.text}`, pageW - margin, y, { align: 'right' });
+      pdf.text(`${a.toFixed(1)} - ${interp.label}`, pageW - margin, y, { align: 'right' });
       y += 2;
 
       // Colored underline
