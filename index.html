@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Business Alignment Assessment</title>
+  <title>Business Alignment Self-Assessment</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -215,8 +215,8 @@
 <body>
 
 <header>
-  <h1>Business Alignment Framework Assessment</h1>
-  <p>Select your answer for each question -the chart updates in real time</p>
+  <h1>Business Alignment Self-Assessment</h1>
+  <p>Select your answer for each question - the chart updates in real time</p>
 </header>
 
 <div class="layout">
@@ -262,7 +262,7 @@ const CATS = [
     id: 'uvp', name: 'Unique Value Proposition (UVP)', short: 'UVP', color: '#2563eb',
     qs: [
       { n:1, text:'Our clients clearly understand what makes our business unique' },
-      { n:2, text:'Our pricing reflects the value we deliver -not just what competitors charge' },
+      { n:2, text:'Our pricing reflects the value we deliver - not just what competitors charge' },
       { n:3, text:'Our clients and prospects see our offering as worth paying a premium for' },
     ]
   },
@@ -715,7 +715,7 @@ function sendResults() {
       btn.disabled = false;
     })
     .catch((err) => {
-      msg.innerHTML = '<span style="color:#dc2626">Failed to send -please try again</span>';
+      msg.innerHTML = '<span style="color:#dc2626">Failed to send - please try again</span>';
       btn.textContent = 'Email me my answers';
       btn.disabled = false;
       console.error('EmailJS error:', err);
@@ -756,7 +756,7 @@ function downloadPDF() {
     // Title in blue
     pdf.setFontSize(18);
     pdf.setTextColor(37, 99, 235);
-    const title = name ? `BUSINESS ALIGNMENT ASSESSMENT -${name.toUpperCase()}` : 'BUSINESS ALIGNMENT ASSESSMENT';
+    const title = name ? `BUSINESS ALIGNMENT SELF-ASSESSMENT - ${name.toUpperCase()}` : 'BUSINESS ALIGNMENT SELF-ASSESSMENT';
     pdf.text(title, margin, 18);
 
     // Questions and answers section
@@ -805,7 +805,7 @@ function downloadPDF() {
         // Answer in category color on the right
         pdf.setFont(undefined, 'bold');
         pdf.setTextColor(cr, cg, cb);
-        pdf.text(`${val} -${label}`, pageW - margin, y, { align: 'right' });
+        pdf.text(`${val} - ${label}`, pageW - margin, y, { align: 'right' });
 
         y += 6;
       });
@@ -856,7 +856,7 @@ function downloadPDF() {
     if (document.body.contains(offscreen)) document.body.removeChild(offscreen);
     btn.disabled = false;
     btn.textContent = 'Download PDF';
-    msg.innerHTML = '<span style="color:#dc2626">PDF generation failed -try again</span>';
+    msg.innerHTML = '<span style="color:#dc2626">PDF generation failed - try again</span>';
     console.error('PDF error:', err);
   });
 }
