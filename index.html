@@ -592,7 +592,7 @@ function renderScores() {
       <div class="sc-val" style="color:${cat.color}">${ans===3 ? a.toFixed(1) : '—'}</div>
       <div class="sc-interp">${
         interp
-          ? `<span style="color:${interp.color};font-weight:600">${interp.label}</span>`
+          ? `<span style="color:${cat.color};font-weight:600">${interp.label}</span>`
           : `${ans} of 3 answered`
       }</div>
       <div class="sc-interp" style="font-size:10px;margin-top:2px;">${
