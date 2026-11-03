@@ -653,12 +653,12 @@ function captureChart() {
 }
 
 // ── Senior advisor list ──────────────────────────────────────────────────────
-// Source of truth is ADVISORS_URL. Today it is advisors.json in this repo; swap it for the
-// Trinity app endpoint once a public advisors route is approved. The fallback keeps the
-// form usable if the fetch fails. Each entry needs { name, email }.
-const ADVISORS_URL = 'advisors.json';
+// Source of truth is the Trinity Power Automate flow (action getAdvisors), the same one the
+// org-chart tool uses. It returns senior advisors as [{ advisorName, advisorEmail }].
+// The fallback keeps the form usable if the flow is unreachable.
+const ADVISORS_URL = 'https://bb06665214b0e7c9957df91fc7a08e.c0.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b061cace61634387b21e176cacf35fb2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=UauD3PRUThSwVs6_q6WMEPdHuOJ_g_tecP5Nn_xIDY0';
 const ADVISORS_FALLBACK = [
-  { name: 'Andrea Szasz',      email: 'andrea.szasz@trinityadvisory.com.au' },
+  { name: 'Andrea Szunyogh-Szasz', email: 'andrea.szasz@trinityadvisory.com.au' },
   { name: 'Conor Sarran',      email: 'conor.sarran@trinityadvisory.com.au' },
   { name: 'Josh Sherrington',  email: 'josh.sherrington@trinityadvisory.com.au' },
   { name: 'Joshua Patten',     email: 'joshua.patten@trinityadvisory.com.au' },
@@ -685,11 +685,16 @@ function renderAdvisors(list) {
 
 async function loadAdvisors() {
   try {
-    const r = await fetch(ADVISORS_URL, { cache: 'no-store' });
+    const r = await fetch(ADVISORS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'getAdvisors' })
+    });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
-    const list = Array.isArray(data) ? data : data.advisors;
-    if (!Array.isArray(list) || list.length === 0) throw new Error('empty advisor list');
+    const list = (Array.isArray(data) ? data : data.advisors || [])
+      .map(a => ({ name: a.name || a.advisorName || '', email: a.email || a.advisorEmail || '' }));
+    if (list.length === 0) throw new Error('empty advisor list');
     renderAdvisors(list);
   } catch (err) {
     console.warn('Advisor list fetch failed, using fallback:', err);
