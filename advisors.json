@@ -1,0 +1,12 @@
+{
+  "_comment": "Senior advisors shown in the client tools. Edit this file or point ADVISORS_URL in index.html at the Trinity app once a public advisors endpoint is approved. Only senior advisors belong here.",
+  "updated": "2026-11-03",
+  "advisors": [
+    { "name": "Andrea Szasz",      "email": "andrea.szasz@trinityadvisory.com.au" },
+    { "name": "Conor Sarran",      "email": "conor.sarran@trinityadvisory.com.au" },
+    { "name": "Josh Sherrington",  "email": "josh.sherrington@trinityadvisory.com.au" },
+    { "name": "Joshua Patten",     "email": "joshua.patten@trinityadvisory.com.au" },
+    { "name": "Nick Mulqueen",     "email": "nick.mulqueen@trinityadvisory.com.au" },
+    { "name": "Richard Caldecott", "email": "richard.caldecott@trinityadvisory.com.au" }
+  ]
+}
