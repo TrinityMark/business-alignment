@@ -9,7 +9,7 @@
    window.trinityAdvisorsReady resolves with the advisor array once the select is filled.
    window.trinityAdvisorEmail(name) returns the advisor's email, or '' if unknown. */
 (function () {
-  var URL = 'https://bb06665214b0e7c9957df91fc7a08e.c0.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b061cace61634387b21e176cacf35fb2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=UauD3PRUThSwVs6_q6WMEPdHuOJ_g_tecP5Nn_xIDY0';
+  var URL = 'https://app.trinityadvisory.com.au/api/flow/advisors';  // Trinity app relay; the flow URL stays server-side
   var FALLBACK = [
     { name: 'Andrea Szunyogh-Szasz', email: 'andrea.szasz@trinityadvisory.com.au' },
     { name: 'Conor Sarran',          email: 'conor.sarran@trinityadvisory.com.au' },
@@ -52,7 +52,7 @@
     var sel = document.getElementById(selectId);
     window.trinityAdvisorsReady = (function () {
       if (!sel) return Promise.resolve([]);
-      return fetch(URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'getAdvisors' }) })
+      return fetch(URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'getAdvisors' }) })
         .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(function (data) { var list = normalise(data); if (!list.length) throw new Error('empty'); return list; })
         .catch(function (err) { console.warn('Advisor list fetch failed, using fallback:', err); return FALLBACK.slice(); })
