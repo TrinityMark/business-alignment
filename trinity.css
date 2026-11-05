@@ -1,0 +1,70 @@
+/* Trinity Advisory shared styles for client tools.
+   Load this before any page-specific CSS so every tool shares one font stack and palette. */
+
+:root {
+  --trinity-blue:   #15397F;
+  --trinity-dark:   #0089CF;
+  --trinity-light:  #C5D9F1;
+  --trinity-gold:   #FFC000;
+  --trinity-grey:   #BFBFBF;
+  --trinity-grey-light: #F2F2F2;
+
+  --status-green: #CAF0CC;
+  --status-amber: #FFE699;
+  --status-red:   #FF9797;
+  --status-red-light: #FFC9C9;
+
+  --text:       #000000;
+  --text-muted: #595959;
+  --border:     var(--trinity-grey);
+  --surface:    #FFFFFF;
+  --page:       var(--trinity-grey-light);
+
+  --font: Aptos, Verdana, Calibri, "Segoe UI", system-ui, sans-serif;
+  --heading-size: 14pt;
+  --body-size:    11pt;
+}
+
+body {
+  font-family: var(--font);
+  font-size: var(--body-size);
+  color: var(--text);
+  background: var(--page);
+}
+
+h1, h2, h3 { font-family: var(--font); color: var(--text); }
+h1 { font-size: var(--heading-size); }
+
+.trinity-header {
+  background: var(--trinity-blue);
+  color: #FFFFFF;
+  border-bottom: 3px solid var(--trinity-dark);
+}
+.trinity-header h1, .trinity-header p { color: #FFFFFF; }
+
+.trinity-btn {
+  background: var(--trinity-blue);
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font);
+}
+.trinity-btn:hover    { background: var(--trinity-dark); }
+.trinity-btn:disabled { background: var(--trinity-grey); cursor: not-allowed; }
+.trinity-btn-secondary { background: var(--trinity-dark); }
+.trinity-btn-secondary:hover { background: var(--trinity-blue); }
+
+.trinity-input, .trinity-select {
+  font-family: var(--font);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+}
+.trinity-input:focus, .trinity-select:focus {
+  outline: none;
+  border-color: var(--trinity-dark);
+}
+
+.trinity-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
